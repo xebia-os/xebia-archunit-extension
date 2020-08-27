@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.xebia</groupId>
-    <artifactId>xarchitecture-test</artifactId>
+    <artifactId>xebia-archunit-extension</artifactId>
     <packaging>pom</packaging>
     <version>0.1.0-SNAPSHOT</version>
     <modules>
-        <module>xebia-archunit-extension</module>
+        <module>archunit-extension</module>
         <module>spring-test-app</module>
     </modules>
 
