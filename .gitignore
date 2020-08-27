@@ -1,0 +1,17 @@
+.#*
+*#
+*~
+target/
+.springBeans
+.sts4-cache
+.settings
+.classpath
+.project
+*.iml
+*.ipr
+*.iws
+.idea
+credentials.yml
+.DS_Store
+.vscode
+.idea/
