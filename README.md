@@ -1,5 +1,7 @@
 # xebia-archunit-extension
 
+![xebia-archunit-extension CI](https://github.com/xebia-os/xebia-archunit-extension/workflows/xebia-archunit-extension%20CI/badge.svg)
+
 A test library built on top of ArchUnit. It codifies best practices that we use at Xebia in our Java Spring Boot projects.
 
 Following are the rules that this library adds:
@@ -20,7 +22,17 @@ We will keep adding more tests to this repository.
 
 ## Usage
 
-Add the following library to your Maven pom.xml
+For Maven users first add the repository to your pom.xml
+
+```xml
+ <repository>
+    <id>github</id>
+    <name>GitHub Packages</name>
+    <url>https://maven.pkg.github.com/xebia-os/xebia-archunit-extension</url>
+</repository>
+```
+
+Then add the following library to your Maven pom.xml
 
 ```xml
 <dependency>
@@ -31,7 +43,7 @@ Add the following library to your Maven pom.xml
 </dependency>
 ``` 
 
-if you use Gradle then add followinng
+if you use Gradle then add following
 
 ```
 testImplementation("com.github.xebia:archunit-extension:0.1.0")
