@@ -6,7 +6,7 @@ A test library built on top of ArchUnit. It codifies best practices that we use 
 
 Following are the rules that this library adds:
 
-1. No Get API should return List or Set
+1. No Get API should return List or Set. This is to enforce pagination
 2. Enforce pagination to avoid performance issues
 3. Entities should not be directly exposed in the REST controllers
 4. REST controllers should return DTOs only
