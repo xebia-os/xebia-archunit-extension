@@ -107,9 +107,9 @@ public final class XebiaArchitectureRules {
                 .should(new ArchCondition<JavaClass>("have @Version field") {
                     @Override
                     public void check(JavaClass javaClass, ConditionEvents events) {
-                        Set<JavaField> fields = javaClass.getFields();
+                        Set<JavaField> fields = javaClass.getAllFields();
                         Optional<JavaField> versionField = fields.stream().filter(field -> field.getAnnotations().stream().map(a -> a.getRawType().getName()).anyMatch(a -> a.equals("javax.persistence.Version"))).findFirst();
-                        events.add(new SimpleConditionEvent(javaClass, versionField.isPresent(), "have @Version field"));
+                        events.add(new SimpleConditionEvent(javaClass, versionField.isPresent(), javaClass.getFullName() + " have @Version field"));
                     }
                 });
     }
