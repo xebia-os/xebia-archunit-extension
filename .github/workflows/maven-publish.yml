@@ -23,9 +23,6 @@ jobs:
 
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-
-    - name: Publish Parent POM to GitHub Packages Apache Maven
-      run: mvn deploy:deploy-file -Dfile=pom.xml -Dpackaging=pom -DgroupId=com.github.xebia -DartifactId=xebia-archunit-extension -s $GITHUB_WORKSPACE/settings.xml
     - name: Publish to GitHub Packages Apache Maven
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
       env:

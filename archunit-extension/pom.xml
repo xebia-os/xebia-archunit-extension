@@ -18,14 +18,6 @@
         <maven.deploy.skip>false</maven.deploy.skip>
     </properties>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/xebia-os/xebia-archunit-extension</url>
-        </repository>
-    </distributionManagement>
-
     <dependencies>
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
