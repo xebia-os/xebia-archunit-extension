@@ -38,7 +38,7 @@ Then add the following library to your Maven pom.xml
 <dependency>
   <groupId>com.github.xebia</groupId>
   <artifactId>archunit-extension</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <scope>test</scope>
 </dependency>
 ``` 
@@ -46,7 +46,7 @@ Then add the following library to your Maven pom.xml
 if you use Gradle then add following
 
 ```
-testImplementation("com.github.xebia:archunit-extension:0.1.0")
+testImplementation("com.github.xebia:archunit-extension:0.2.0")
 ```
 
 Once you have added the library you can use it in two ways.
