@@ -17,6 +17,10 @@ Following are the rules that this library adds:
 9. Root package should have `Application` class
 10. Slf4j Logger should be `private static final`
 11. Repository interfaces should be inside `..repository..` package
+12. Util classes should not be injected
+13. Util class methods should be static
+14. Spring Singleton components should have only final fields
+15. Layers should not have cycles
 
 We will keep adding more tests to this repository.
 
