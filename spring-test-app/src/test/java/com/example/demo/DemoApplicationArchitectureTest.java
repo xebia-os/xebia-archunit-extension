@@ -14,6 +14,9 @@ class DemoApplicationArchitectureTest extends AbstractArchitectureTests {
                         .importPackagesOf(Application.class),
                 new String[]{UserEntity.class.getPackage().getName()},
                 "com.example.(*service).domain",
-                Application.class.getPackage().getName(), "Dto");
+                Application.class.getPackage().getName(),
+                "com.example.demo.(*)..",
+                new String[]{"Dto"},
+                new String[]{"Util", "Utils"});
     }
 }

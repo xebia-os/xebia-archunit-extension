@@ -12,18 +12,24 @@ public abstract class AbstractArchitectureTests {
     private final String[] entityClasses;
     private final String domainPackageMatchIdentifier;
     private final String rootPackageIdentifier;
-    private final String dtoClassSuffixes;
+    private final String cycleCheckPackageIdentifier;
+    private final String[] dtoClassSuffixes;
+    private final String[] utilClassSuffixes;
 
     public AbstractArchitectureTests(JavaClasses javaClasses,
                                      String[] entityClasses,
                                      String domainPackageMatchIdentifier,
                                      String rootPackageIdentifier,
-                                     String dtoClassSuffixes) {
+                                     String cycleCheckPackageIdentifier,
+                                     String[] dtoClassSuffixes,
+                                     String[] utilClassSuffixes) {
         this.javaClasses = javaClasses;
         this.entityClasses = entityClasses;
         this.domainPackageMatchIdentifier = domainPackageMatchIdentifier;
         this.rootPackageIdentifier = rootPackageIdentifier;
+        this.cycleCheckPackageIdentifier = cycleCheckPackageIdentifier;
         this.dtoClassSuffixes = dtoClassSuffixes;
+        this.utilClassSuffixes = utilClassSuffixes;
     }
 
     @Test
@@ -76,7 +82,19 @@ public abstract class AbstractArchitectureTests {
 
     @Test
     void utils_classes_should_have_private_constructor() {
-        utilsClassesShouldHavePrivateConstructor()
+        utilsClassesShouldHavePrivateConstructor(utilClassSuffixes)
+                .check(javaClasses);
+    }
+
+    @Test
+    void utils_classes_should_not_be_injected() {
+        utilsClassesShouldNotBeInjected(utilClassSuffixes)
+                .check(javaClasses);
+    }
+
+    @Test
+    void utils_classes_should_only_have_static_methods() {
+        utilClassesMethodsShouldBeStatic(utilClassSuffixes)
                 .check(javaClasses);
     }
 
@@ -95,6 +113,18 @@ public abstract class AbstractArchitectureTests {
     @Test
     void repository_should_reside_in_repository_package() {
         repositoryShouldResideInRepositoryPackage()
+                .check(javaClasses);
+    }
+
+    @Test
+    void spring_singleton_component_classes_should_have_only_final_fields() {
+        springSingletonComponentsShouldOnlyHaveFinalFields()
+                .check(javaClasses);
+    }
+
+    @Test
+    void layers_should_be_free_of_cycles() {
+        layersShouldBeFreeOfCycles(cycleCheckPackageIdentifier)
                 .check(javaClasses);
     }
 }

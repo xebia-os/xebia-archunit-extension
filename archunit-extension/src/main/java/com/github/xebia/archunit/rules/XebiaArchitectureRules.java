@@ -1,5 +1,7 @@
 package com.github.xebia.archunit.rules;
 
+import com.tngtech.archunit.core.domain.JavaAccess;
+import com.tngtech.archunit.core.domain.JavaAnnotation;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaConstructor;
@@ -12,7 +14,6 @@ import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ClassesTransformer;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
-import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -26,13 +27,12 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.all;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.no;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noMethods;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 public final class XebiaArchitectureRules {
-
-    private XebiaArchitectureRules() {
-    }
 
     public static ArchRule noGetApiShouldReturnListOrSet() {
         return noMethods()
@@ -130,20 +130,22 @@ public final class XebiaArchitectureRules {
      * @return
      */
     public static ArchRule microservicesShouldNotDependOnEachOther(String packageIdentifier) {
-        return SlicesRuleDefinition.slices()
+        return slices()
                 .matching(packageIdentifier)
                 .namingSlices("$2 of $1")
                 .should().notDependOnEachOther();
     }
 
-    public static ArchRule utilsClassesShouldHavePrivateConstructor() {
-        ClassesTransformer<JavaConstructor> utilClasses =
-                new AbstractClassesTransformer<JavaConstructor>("utility constructors") {
+    public static ArchRule utilsClassesShouldHavePrivateConstructor(String... utilClassSuffixes) {
+        Set<String> utilClassSuffixSet = createUtilClassSet(utilClassSuffixes);
+        ClassesTransformer<JavaConstructor> utilClassesConstructors =
+                new AbstractClassesTransformer<JavaConstructor>("utility class constructors") {
                     @Override
                     public Iterable<JavaConstructor> doTransform(JavaClasses classes) {
                         Set<JavaConstructor> result = new HashSet<>();
                         for (JavaClass javaClass : classes) {
-                            if (javaClass.getSimpleName().endsWith("Util") || javaClass.getSimpleName().endsWith("Utils")) {
+                            boolean utilClass = utilClassSuffixSet.stream().anyMatch(javaClass.getSimpleName()::endsWith);
+                            if (utilClass) {
                                 result.addAll(javaClass.getConstructors());
                             }
                         }
@@ -151,7 +153,7 @@ public final class XebiaArchitectureRules {
                     }
                 };
 
-        ArchCondition<JavaConstructor> havePrivateConstructors = new ArchCondition<JavaConstructor>("be private") {
+        ArchCondition<JavaConstructor> bePrivate = new ArchCondition<JavaConstructor>("be private") {
             @Override
             public void check(JavaConstructor constructor, ConditionEvents events) {
                 boolean privateAccess = constructor.getModifiers().contains(JavaModifier.PRIVATE);
@@ -159,8 +161,69 @@ public final class XebiaArchitectureRules {
                 events.add(new SimpleConditionEvent(constructor, privateAccess, message));
             }
         };
-        return all(utilClasses)
-                .should(havePrivateConstructors);
+        return all(utilClassesConstructors)
+                .should(bePrivate);
+    }
+
+    public static ArchRule utilsClassesShouldNotBeInjected(String... utilClassSuffixes) {
+        Set<String> utilClassSuffixSet = createUtilClassSet(utilClassSuffixes);
+        ClassesTransformer<JavaClass> utilClasses =
+                new AbstractClassesTransformer<JavaClass>("utility class") {
+                    @Override
+                    public Iterable<JavaClass> doTransform(JavaClasses classes) {
+                        Set<JavaClass> result = new HashSet<>();
+                        for (JavaClass javaClass : classes) {
+                            boolean utilClass = utilClassSuffixSet.stream().anyMatch(javaClass.getSimpleName()::endsWith);
+                            if (utilClass) {
+                                result.add(javaClass);
+                            }
+                        }
+                        return result;
+                    }
+                };
+
+        ArchCondition<JavaClass> beInjected = new ArchCondition<JavaClass>("be injected") {
+            @Override
+            public void check(JavaClass javaClass, ConditionEvents events) {
+                Set<JavaAccess<?>> accessesToSelf = javaClass.getAccessesToSelf();
+                com.tngtech.archunit.base.Optional<JavaAnnotation<JavaClass>> hasComponentAnnotation = javaClass.tryGetAnnotationOfType("org.springframework.stereotype.Component");
+                com.tngtech.archunit.base.Optional<JavaAnnotation<JavaClass>> hasInjectAnnotation = javaClass.tryGetAnnotationOfType("javax.inject.Inject");
+                String message = String.format("%s is annotated with @Component/@Inject annotation", javaClass.getFullName());
+                events.add(new SimpleConditionEvent(javaClass, hasComponentAnnotation.isPresent() || hasInjectAnnotation.isPresent(), message));
+            }
+        };
+        return no(utilClasses)
+                .should(beInjected);
+
+    }
+
+    public static ArchRule utilClassesMethodsShouldBeStatic(String... utilClassSuffixes) {
+        Set<String> utilClassSuffixSet = createUtilClassSet(utilClassSuffixes);
+        ClassesTransformer<JavaMethod> utilClassesMethods =
+                new AbstractClassesTransformer<JavaMethod>("utility class methods") {
+                    @Override
+                    public Iterable<JavaMethod> doTransform(JavaClasses classes) {
+                        Set<JavaMethod> result = new HashSet<>();
+                        for (JavaClass javaClass : classes) {
+                            boolean utilClass = utilClassSuffixSet.stream().anyMatch(javaClass.getSimpleName()::endsWith);
+                            if (utilClass) {
+                                result.addAll(javaClass.getMethods());
+                            }
+                        }
+                        return result;
+                    }
+                };
+
+        ArchCondition<JavaMethod> beStatic = new ArchCondition<JavaMethod>("be static") {
+            @Override
+            public void check(JavaMethod javaMethod, ConditionEvents events) {
+                boolean staticAccess = javaMethod.getModifiers().contains(JavaModifier.STATIC);
+                String message = String.format("%s is not static", javaMethod.getFullName());
+                events.add(new SimpleConditionEvent(javaMethod, staticAccess, message));
+            }
+        };
+        return all(utilClassesMethods)
+                .should(beStatic);
     }
 
     public static ArchRule rootDirectoryShouldHaveApplicationClass(String rootPackageIdentifier) {
@@ -182,5 +245,33 @@ public final class XebiaArchitectureRules {
                 .that().haveNameMatching(".*Repository")
                 .should().resideInAPackage("..repository..")
                 .as("Repositories should reside in a package '..repository..'");
+    }
+
+    public static ArchRule springSingletonComponentsShouldOnlyHaveFinalFields() {
+        return classes()
+                .that().areAnnotatedWith("org.springframework.stereotype.Component")
+                .or().areAnnotatedWith("org.springframework.stereotype.Service")
+                .and().areNotAnnotatedWith("org.springframework.boot.context.properties.ConfigurationProperties")
+                .or().areAnnotatedWith("org.springframework.stereotype.Controller")
+                .or().areAnnotatedWith("org.springframework.web.bind.annotation.RestController")
+                .or().areAnnotatedWith("org.springframework.web.bind.annotation.RestController")
+                .should().haveOnlyFinalFields();
+    }
+
+    public static ArchRule layersShouldBeFreeOfCycles(String packageIdentifier) {
+        return slices()
+                .matching(packageIdentifier)
+                .should().beFreeOfCycles();
+    }
+
+    private static Set<String> createUtilClassSet(String[] utilClassSuffixes) {
+        Set<String> utilClassSuffixSet = new HashSet<>();
+        if (utilClassSuffixes == null || utilClassSuffixes.length == 0) {
+            utilClassSuffixSet.add("Util");
+            utilClassSuffixSet.add("Utils");
+        } else {
+            utilClassSuffixSet.addAll(Arrays.asList(utilClassSuffixes));
+        }
+        return utilClassSuffixSet;
     }
 }
