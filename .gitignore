@@ -16,3 +16,4 @@ credentials.yml
 .vscode
 .idea/
 TODO.md
+release.properties

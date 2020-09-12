@@ -7,17 +7,24 @@
     <groupId>com.github.xebia</groupId>
     <artifactId>xebia-archunit-extension</artifactId>
     <packaging>pom</packaging>
-    <version>0.3.0</version>
+    <version>0.3.0-SNAPSHOT</version>
+
     <modules>
         <module>archunit-extension</module>
         <module>spring-test-app</module>
     </modules>
 
+    <scm>
+        <connection>scm:git:https://github.com/xebia-os/xebia-archunit-extension.git</connection>
+        <developerConnection>scm:git:git@github.com:xebia-os/xebia-archunit-extension.git.git</developerConnection>
+        <url>https://github.com/xebia-os/xebia-archunit-extension</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/xebia-os/xebia-archunit-extension</url>
+            <id>bintray</id>
+            <url>https://api.bintray.com/maven/xebia-os/maven-repo/xebia-archunit-extension/;publish=1</url>
         </repository>
     </distributionManagement>
 
@@ -25,5 +32,51 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <configuration>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
