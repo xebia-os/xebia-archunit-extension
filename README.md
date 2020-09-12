@@ -6,6 +6,9 @@
 
 A test library built on top of ArchUnit. It codifies best practices that we use at Xebia in our Java Spring Boot JPA projects.
 
+> **Do not use version older than 0.3.0 that are published on Github packages. We publish latest packages on Bintray now.**
+> **Github does not allow to delete public packages so we will have to live with them.**
+
 Following are the rules that this library adds:
 
 1. No Get API should return List or Set. This is to enforce pagination
