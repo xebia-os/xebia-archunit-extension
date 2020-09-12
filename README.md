@@ -2,6 +2,8 @@
 
 ![xebia-archunit-extension CI](https://github.com/xebia-os/xebia-archunit-extension/workflows/xebia-archunit-extension%20CI/badge.svg)
 
+[ ![Download](https://api.bintray.com/packages/xebia-os/maven-repo/xebia-archunit-extension/images/download.svg) ](https://bintray.com/xebia-os/maven-repo/xebia-archunit-extension/_latestVersion)
+
 A test library built on top of ArchUnit. It codifies best practices that we use at Xebia in our Java Spring Boot JPA projects.
 
 Following are the rules that this library adds:
@@ -33,9 +35,9 @@ For Maven users first add the repository to your pom.xml
 
 ```xml
  <repository>
-    <id>github</id>
-    <name>GitHub Packages</name>
-    <url>https://maven.pkg.github.com/xebia-os/xebia-archunit-extension</url>
+    <id>bintray</id>
+    <name>Xebia BinTray Packages</name>
+    <url>https://dl.bintray.com/xebia-os/maven-repo/</url>
 </repository>
 ```
 
@@ -45,7 +47,7 @@ Then add the following library to your Maven pom.xml
 <dependency>
   <groupId>com.github.xebia</groupId>
   <artifactId>archunit-extension</artifactId>
-  <version>0.2.0</version>
+  <version>0.4.0</version>
   <scope>test</scope>
 </dependency>
 ``` 
@@ -53,7 +55,7 @@ Then add the following library to your Maven pom.xml
 if you use Gradle then add following
 
 ```
-testImplementation("com.github.xebia:archunit-extension:0.2.0")
+testImplementation 'com.github.xebia:archunit-extension:0.4.0'
 ```
 
 Once you have added the library you can use it in two ways.
