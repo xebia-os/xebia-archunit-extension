@@ -2,7 +2,7 @@
 
 ![xebia-archunit-extension CI](https://github.com/xebia-os/xebia-archunit-extension/workflows/xebia-archunit-extension%20CI/badge.svg)
 
-A test library built on top of ArchUnit. It codifies best practices that we use at Xebia in our Java Spring Boot projects.
+A test library built on top of ArchUnit. It codifies best practices that we use at Xebia in our Java Spring Boot JPA projects.
 
 Following are the rules that this library adds:
 
@@ -21,6 +21,9 @@ Following are the rules that this library adds:
 13. Util class methods should be static
 14. Spring Singleton components should have only final fields
 15. Layers should not have cycles
+16. Favor constructor injection  over field injection
+17. Favor Java 8 Date Time over Joda API
+18. Favor Builder over long list constructor
 
 We will keep adding more tests to this repository.
 

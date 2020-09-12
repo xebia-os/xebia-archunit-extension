@@ -8,7 +8,6 @@ import static com.github.xebia.archunit.rules.XebiaArchitectureRules.*;
 public abstract class AbstractArchitectureTests {
 
     private final JavaClasses javaClasses;
-
     private final String[] entityClasses;
     private final String domainPackageMatchIdentifier;
     private final String rootPackageIdentifier;
@@ -127,4 +126,20 @@ public abstract class AbstractArchitectureTests {
         layersShouldBeFreeOfCycles(cycleCheckPackageIdentifier)
                 .check(javaClasses);
     }
+
+    @Test
+    void favor_constructor_injection_over_field_injection() {
+        favorConstructorInjectionOverFieldInjection().check(javaClasses);
+    }
+
+    @Test
+    void favor_java8_datetime_api_over_joda_api() {
+        favorJava8DateTimeApiOverJodaTime().check(javaClasses);
+    }
+
+    @Test
+    void favor_builder_over_long_list_constructor() {
+        favorBuilderOverLongListConstructor().check(javaClasses);
+    }
+
 }

@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.all;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
@@ -254,7 +255,7 @@ public final class XebiaArchitectureRules {
                 .and().areNotAnnotatedWith("org.springframework.boot.context.properties.ConfigurationProperties")
                 .or().areAnnotatedWith("org.springframework.stereotype.Controller")
                 .or().areAnnotatedWith("org.springframework.web.bind.annotation.RestController")
-                .or().areAnnotatedWith("org.springframework.web.bind.annotation.RestController")
+                .or().areAnnotatedWith("org.springframework.stereotype.Repository")
                 .should().haveOnlyFinalFields();
     }
 
@@ -263,6 +264,64 @@ public final class XebiaArchitectureRules {
                 .matching(packageIdentifier)
                 .should().beFreeOfCycles();
     }
+
+    public static ArchRule favorConstructorInjectionOverFieldInjection() {
+        return fields().should(new ArchCondition<JavaField>("not be @Autowired/@Inject") {
+            @Override
+            public void check(JavaField javaField, ConditionEvents events) {
+                if (javaField.isAnnotatedWith("org.springframework.beans.factory.annotation.Autowired")
+                        || javaField.isAnnotatedWith("javax.inject.Inject")) {
+                    events.add(SimpleConditionEvent.violated(javaField,
+                            String.format("Field %s of class %s is using field injection. Prefer constructor injection.", javaField.getName(), javaField.getOwner().getName())));
+                }
+            }
+        });
+    }
+
+    public static ArchRule favorJava8DateTimeApiOverJodaTime() {
+        return classes().should(new ArchCondition<JavaClass>("not use Joda time") {
+            @Override
+            public void check(JavaClass javaClass, ConditionEvents events) {
+                List<JavaField> jodaFields = javaClass.getFields()
+                        .stream()
+                        .filter(field -> field.getRawType().getName().startsWith("org.joda"))
+                        .collect(Collectors.toList());
+                jodaFields.forEach(
+                        jodaField -> events.add(SimpleConditionEvent.violated(
+                                jodaField,
+                                String.format("Field %s of class %s is using Joda time. Prefer Java 8 date time API", jodaField.getName(), jodaField.getOwner().getName())
+                        ))
+                );
+            }
+        });
+    }
+
+    public static ArchRule favorBuilderOverLongListConstructor() {
+        return classes()
+                .that().areNotAnnotatedWith("org.springframework.stereotype.Component")
+                .or().areNotAnnotatedWith("org.springframework.stereotype.Service")
+                .or().areNotAnnotatedWith("org.springframework.boot.context.properties.ConfigurationProperties")
+                .or().areNotAnnotatedWith("org.springframework.stereotype.Controller")
+                .or().areNotAnnotatedWith("org.springframework.web.bind.annotation.RestController")
+                .or().areNotAnnotatedWith("org.springframework.stereotype.Repository")
+                .should(new ArchCondition<JavaClass>("not have constructor more than 3 parameters") {
+                    @Override
+                    public void check(JavaClass javaClass, ConditionEvents events) {
+                        Set<JavaConstructor> classesWithLongConstructors = javaClass.getConstructors()
+                                .stream()
+                                .filter(c -> c.getRawParameterTypes().size() > 3)
+                                .collect(Collectors.toSet());
+
+                        classesWithLongConstructors.forEach(
+                                c -> events.add(SimpleConditionEvent.violated(
+                                        c, String.format("Constructor %s of class %s has more than 3 parameters. Prefer Builder over long list constructors", c.getName(), c.getOwner().getName())
+                                ))
+                        );
+                    }
+                });
+
+    }
+
 
     private static Set<String> createUtilClassSet(String[] utilClassSuffixes) {
         Set<String> utilClassSuffixSet = new HashSet<>();

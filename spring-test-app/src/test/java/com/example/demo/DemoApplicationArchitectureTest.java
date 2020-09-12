@@ -7,7 +7,6 @@ import com.tngtech.archunit.core.importer.ImportOption;
 
 class DemoApplicationArchitectureTest extends AbstractArchitectureTests {
 
-
     public DemoApplicationArchitectureTest() {
         super(new ClassFileImporter()
                         .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
