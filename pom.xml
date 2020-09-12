@@ -16,7 +16,7 @@
 
     <scm>
         <connection>scm:git:https://github.com/xebia-os/xebia-archunit-extension.git</connection>
-        <developerConnection>scm:git:git@github.com:xebia-os/xebia-archunit-extension.git.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:xebia-os/xebia-archunit-extension.git</developerConnection>
         <url>https://github.com/xebia-os/xebia-archunit-extension</url>
         <tag>HEAD</tag>
     </scm>
