@@ -100,3 +100,12 @@ So, you can directly import it and use them.
 
 ![](images/api.png) 
 
+## Releasing a new package
+
+To publish a new package use the following commands.
+
+```
+$ ./mvnw -Prelease clean install
+$ ./mvnw release:prepare
+$ ./mvnw release:perform 
+```
