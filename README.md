@@ -44,6 +44,14 @@ For Maven users first add the repository to your pom.xml
 </repository>
 ```
 
+For Gradle add following
+
+```
+maven {
+		url('https://dl.bintray.com/xebia-os/maven-repo/')
+}
+```
+
 Then add the following library to your Maven pom.xml
 
 ```xml
@@ -76,14 +84,16 @@ import com.tngtech.archunit.core.importer.ImportOption;
 
 class DemoApplicationArchitectureTest extends AbstractArchitectureTests {
 
-
     public DemoApplicationArchitectureTest() {
         super(new ClassFileImporter()
                         .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
                         .importPackagesOf(Application.class),
                 new String[]{UserEntity.class.getPackage().getName()},
                 "com.example.(*service).domain",
-                Application.class.getPackage().getName(), "Dto");
+                Application.class.getPackage().getName(),
+                "com.example.demo.(*)..",
+                new String[]{"Dto"},
+                new String[]{"Util", "Utils"});
     }
 }
 ```
