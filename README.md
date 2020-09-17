@@ -48,7 +48,7 @@ For Gradle add following
 
 ```
 maven {
-		url('https://dl.bintray.com/xebia-os/maven-repo/')
+   url('https://dl.bintray.com/xebia-os/maven-repo/')
 }
 ```
 
