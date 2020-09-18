@@ -20,6 +20,13 @@ public class UserEntity extends AbstractEntity {
     public UserEntity() {
     }
 
+    private UserEntity(String name, String bio, LocalDate birthdate, String address) {
+        this.name = name;
+        this.bio = bio;
+        this.birthdate = birthdate;
+        this.address = address;
+    }
+
     public Long getId() {
         return id;
     }

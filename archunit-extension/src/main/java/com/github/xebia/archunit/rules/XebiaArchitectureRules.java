@@ -15,6 +15,7 @@ import com.tngtech.archunit.lang.ClassesTransformer;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -309,7 +310,7 @@ public final class XebiaArchitectureRules {
                     public void check(JavaClass javaClass, ConditionEvents events) {
                         Set<JavaConstructor> classesWithLongConstructors = javaClass.getConstructors()
                                 .stream()
-                                .filter(c -> c.getRawParameterTypes().size() > 3)
+                                .filter(c -> Modifier.isPublic(c.reflect().getModifiers()) && c.getRawParameterTypes().size() > 3)
                                 .collect(Collectors.toSet());
 
                         classesWithLongConstructors.forEach(
